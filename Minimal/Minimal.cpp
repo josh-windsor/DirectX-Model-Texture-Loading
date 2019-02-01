@@ -29,7 +29,7 @@ public:
 	{
 		m_position = v3(0.5f, 0.5f, 0.5f);
 		m_size = 1.0f;
-		systems.pCamera->eye = v3(10.f, 5.f, 7.f);
+		systems.pCamera->eye = v3(10.f, 1.f, 7.f);
 		systems.pCamera->look_at(v3(3.f, 0.5f, 0.f));
 
 		// compile a set of shaders
@@ -49,10 +49,15 @@ public:
 
 		// Initialize a mesh from an .OBJ file
 		create_mesh_from_obj(systems.pD3DDevice, m_meshArray[1], "Assets/Models/apple.obj", 0.01f);
+		create_mesh_from_obj(systems.pD3DDevice, m_meshArray[2], "Assets/Models/house_obj.obj", 0.01f);
+		create_mesh_from_obj(systems.pD3DDevice, m_meshArray[3], "Assets/Models/grass.obj", 0.01f);
+
 
 		// Initialise some textures;
 		m_textures[0].init_from_dds(systems.pD3DDevice, "Assets/Textures/brick.dds");
 		m_textures[1].init_from_dds(systems.pD3DDevice, "Assets/Textures/apple_diffuse.dds");
+		m_textures[2].init_from_dds(systems.pD3DDevice, "Assets/Textures/house_diffuse.dds");
+		m_textures[3].init_from_dds(systems.pD3DDevice, "Assets/Textures/grass.dds");
 
 		// We need a sampler state to define wrapping and mipmap parameters.
 		m_pLinearMipSamplerState = create_basic_sampler(systems.pD3DDevice, D3D11_TEXTURE_ADDRESS_WRAP);
@@ -128,7 +133,7 @@ public:
 
 		constexpr f32 kGridSpacing = 1.5f;
 		constexpr u32 kNumInstances = 5;
-		constexpr u32 kNumModelTypes = 2;
+		constexpr u32 kNumModelTypes = 4;
 
 		for(u32 i = 0; i < kNumModelTypes; ++i)
 		{
@@ -171,8 +176,8 @@ private:
 
 	ShaderSet m_meshShader;
 	
-	Mesh m_meshArray[2];
-	Texture m_textures[2];
+	Mesh m_meshArray[4];
+	Texture m_textures[4];
 	ID3D11SamplerState* m_pLinearMipSamplerState = nullptr;
 
 	v3 m_position;
