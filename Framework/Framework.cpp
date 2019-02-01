@@ -1264,9 +1264,11 @@ int framework_main(FrameworkApp& rApp, const char* pTitleString, HINSTANCE hInst
 
 
 		if (mouse.rightButtonDown) {
-			camera.checkKeyboardMovement();
-			camera.checkMouseRotation();
 		}
+		camera.checkMouseRotation();
+
+		camera.checkKeyboardMovement();
+
 
 		camera.updateMatrices();
 
@@ -1375,14 +1377,14 @@ void Camera::move(const MoveDir dir, const float amount)
 {
 	switch (dir)
 	{
-	case Camera::Forward: eye += forward * v3(amount); break;
-	case Camera::Back: eye -= forward * v3(amount); break;
+	case Camera::Forward: eye += forward * (v3(amount) * v3 (1, 0, 1)); break;
+	case Camera::Back: eye -= forward * (v3(amount) * v3(1, 0, 1)); break;
 #ifdef SIMPLE_MATHS_LEFT_HANDED
-	case Camera::Left: eye -= right   * v3(amount); break;
-	case Camera::Right: eye += right   * v3(amount); break;
+	case Camera::Left: eye -= right   * (v3(amount) * v3(1, 0, 1)); break;
+	case Camera::Right: eye += right   * (v3(amount) * v3(1, 0, 1)); break;
 #else
-	case Camera::Left: eye += right   * v3(amount); break;
-	case Camera::Right: eye -= right   * v3(amount); break;
+	case Camera::Left: eye += right   * (v3(amount) * v3(1, 0, 1)); break;
+	case Camera::Right: eye -= right   * (v3(amount) * v3(1, 0, 1)); break;
 #endif // SIMPLE_MATHS_LEFT_HANDED
 	}
 }
