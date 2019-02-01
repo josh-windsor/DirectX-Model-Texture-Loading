@@ -4,6 +4,18 @@
 #include "Mesh.h"
 #include "Texture.h"
 
+#include <iostream>
+#include <fstream>
+
+using namespace std;
+
+struct myVec3
+{
+	float x;
+	float y;
+	float z;
+};
+
 //================================================================================
 // Minimal Application
 // An example of how to use selected parts of this framework.
@@ -50,9 +62,12 @@ public:
 		// Initialize a mesh from an .OBJ file
 		create_mesh_from_obj(systems.pD3DDevice, m_meshArray[1], "Assets/Models/apple.obj", 0.01f);
 
+		create_mesh_from_obj(systems.pD3DDevice, m_meshArray[2], "Assets/Models/Lowpoly_tree_sample.obj", 0.1f);
+
 		// Initialise some textures;
 		m_textures[0].init_from_dds(systems.pD3DDevice, "Assets/Textures/brick.dds");
 		m_textures[1].init_from_dds(systems.pD3DDevice, "Assets/Textures/apple_diffuse.dds");
+		m_textures[2].init_from_dds(systems.pD3DDevice, "Assets/Textures/palm_bark.dds");
 
 		// We need a sampler state to define wrapping and mipmap parameters.
 		m_pLinearMipSamplerState = create_basic_sampler(systems.pD3DDevice, D3D11_TEXTURE_ADDRESS_WRAP);
@@ -83,6 +98,48 @@ public:
 
 	void on_render(SystemsInterface& systems) override
 	{
+		bool movingTrees = false;
+		constexpr u32 kNumModelTypes = 3;
+		constexpr u32 kNumInstances[kNumModelTypes] = {1, 2, 5};
+		const int maxNumber = 10;
+		ifstream files[kNumModelTypes];
+
+		files[0] = ifstream("blocks.txt", fstream::in);
+		files[1] = ifstream("apples.txt", fstream::in);
+		files[2] = ifstream("trees.txt", fstream::in);
+
+		myVec3 positions[kNumModelTypes][maxNumber];
+
+		for (size_t i = 0; i < kNumModelTypes; i++)
+		{
+			for (size_t j = 0; j < kNumInstances[i]; j++)
+			{
+				string line;
+				
+				if (j >= maxNumber)
+					break;
+
+				std::getline(files[i], line);
+				
+				myVec3 temp;
+				int split = line.find(',');
+				temp.x = stof(line.substr(0, split));
+
+				line = line.substr(split + 1, line.size());
+				split = line.find(',');
+
+				temp.y = stof(line.substr(0, split));
+
+				line = line.substr(split + 1, line.size());
+				line.erase(remove(line.begin(), line.end(), ' '), line.end());
+				temp.z = stof(line);
+
+				positions[i][j] = temp;
+				
+			}
+		}
+
+
 		//////////////////////////////////////////////////////////////////////////
 		// Imgui can also be used inside the render function.
 		//////////////////////////////////////////////////////////////////////////
@@ -127,8 +184,8 @@ public:
 
 
 		constexpr f32 kGridSpacing = 1.5f;
-		constexpr u32 kNumInstances = 5;
-		constexpr u32 kNumModelTypes = 2;
+		//constexpr u32 kNumInstances = 5;
+		//constexpr u32 kNumModelTypes = 3;
 
 		for(u32 i = 0; i < kNumModelTypes; ++i)
 		{
@@ -137,10 +194,11 @@ public:
 			m_textures[i].bind(systems.pD3DContext, ShaderStage::kPixel, 0);
 
 			// Draw several instances
-			for (u32 j = 0; j < kNumInstances; ++j)
+			for (u32 j = 0; j < kNumInstances[i]; ++j)
 			{
 				// Compute MVP matrix.
-				m4x4 matModel = m4x4::CreateTranslation(v3(j * kGridSpacing, i * kGridSpacing, 0.f));
+				m4x4 matModel = m4x4::CreateTranslation(v3(positions[i][j].x, positions[i][j].y, positions[i][j].z));
+				
 				m4x4 matMVP = matModel * systems.pCamera->vpMatrix;
 
 				// Update Per Draw Data
@@ -152,6 +210,8 @@ public:
 				// Draw the mesh.
 				m_meshArray[i].draw(systems.pD3DContext);
 			}
+
+			movingTrees = false;
 		}
 
 	}
@@ -171,8 +231,8 @@ private:
 
 	ShaderSet m_meshShader;
 	
-	Mesh m_meshArray[2];
-	Texture m_textures[2];
+	Mesh m_meshArray[3];
+	Texture m_textures[3];
 	ID3D11SamplerState* m_pLinearMipSamplerState = nullptr;
 
 	v3 m_position;
