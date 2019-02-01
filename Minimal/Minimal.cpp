@@ -61,11 +61,11 @@ public:
 
 		// Initialize a mesh from an .OBJ file
 		create_mesh_from_obj(systems.pD3DDevice, m_meshArray[1], "Assets/Models/apple.obj", 0.01f);
-		create_mesh_from_obj(systems.pD3DDevice, m_meshArray[2], "Assets/Models/house_obj.obj", 0.01f);
-		create_mesh_from_obj(systems.pD3DDevice, m_meshArray[3], "Assets/Models/grass.obj", 0.01f);
 
 
 		create_mesh_from_obj(systems.pD3DDevice, m_meshArray[2], "Assets/Models/Lowpoly_tree_sample.obj", 0.1f);
+		create_mesh_from_obj(systems.pD3DDevice, m_meshArray[3], "Assets/Models/house_obj.obj", 0.01f);
+		create_mesh_from_obj(systems.pD3DDevice, m_meshArray[4], "Assets/Models/grass.obj", 0.01f);
 
 		// Initialise some textures;
 		m_textures[0].init_from_dds(systems.pD3DDevice, "Assets/Textures/brick.dds");
@@ -192,8 +192,12 @@ public:
 
 		constexpr f32 kGridSpacing = 1.5f;
     
+
+		bool amGrass = false;
 		for(u32 i = 0; i < kNumModelTypes; ++i)
 		{
+			if (i == 5)
+				amGrass = true;
 			// Bind a mesh and texture.
 			m_meshArray[i].bind(systems.pD3DContext);
 			m_textures[i].bind(systems.pD3DContext, ShaderStage::kPixel, 0);
@@ -216,7 +220,7 @@ public:
 				m_meshArray[i].draw(systems.pD3DContext);
 			}
 
-			movingTrees = false;
+			amGrass = false;
 		}
 
 	}
